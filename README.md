@@ -1,2 +1,7 @@
 # cairo-learn
-Statistical &amp; Machine Learning algorithms in Cairo
+
+Statistical and Machine Learning algorithms in Cairo
+
+## Clustering Algorithms
+
+KNN
