@@ -11,14 +11,19 @@ from starkware.cairo.common.alloc import alloc
 from src.utils.arrays import append_element
 
 
-func sum_of_squared_diff(point_a_len: felt, point_a: felt*, point_b_len: felt, point_b: felt*) -> (_sum_diff: felt) {
+func sum_of_squared_diff{range_check_ptr}(point_a_len: felt, point_a: felt*, point_b_len: felt, point_b: felt*) -> (_sum_diff: felt) {
+    alloc_locals;
     if (point_a_len == 0) {
-        return 0;
+        return (0,);
     }
-    let (diff) = (point_a[0] - point_b[0]);
-    let squared_diff = pow(diff, 2);
-    let sum_of_rest = sum_of_diff(point_a_len=point_a_len - 1, point_a=point_a + 1, point_b_len=point_b_len - 1, point_b=point_b + 1);
-    return squared_diff + sum_of_rest;
+
+    let value_a = point_a[0];
+    let value_b = point_b[0];
+    let diff = value_a - value_b;
+    let (sum_of_rest) = sum_of_squared_diff(point_a_len=point_a_len - 1, point_a=point_a + 1, point_b_len=point_b_len - 1, point_b=point_b + 1);
+    let (_squared_diff) = pow(diff, 2);
+    let res = _squared_diff + sum_of_rest;
+    return (_sum_diff=res);
 }
 
 func prepare_argument(argument_pointer: felt*, argument_size: felt) -> (argument: felt) {
@@ -107,7 +112,7 @@ func map_struct{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}
     let implicit_args_len = map_struct.ImplicitArgs.SIZE;
     tempvar implicit_args = new map_struct.ImplicitArgs(syscall_ptr, pedersen_ptr, range_check_ptr);
 
-    let (mapped_array: felt*, updated_implicit_args: felt*) = generic.map(
+    let (mapped_array: felt*, updated_implicit_args: felt*) = map(
         function, array_len, array, element_size, implicit_args_len, implicit_args
     );
 

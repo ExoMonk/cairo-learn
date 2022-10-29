@@ -1,11 +1,12 @@
 %lang starknet
 from starkware.cairo.common.math import assert_nn
 from starkware.cairo.common.cairo_builtins import HashBuiltin
+from starkware.cairo.common.alloc import alloc
 
 from src.utils.distance import euclidian
 from src.utils.maths import map_struct
 from src.utils.arrays import get_first_element_at, get_second_element_at, min, max
-from src.utils.models import Matrix
+from src.utils.models import Matrix, Point
 
 @storage_var
 func n_clusters() -> (_n_clusters: felt) {
@@ -16,7 +17,7 @@ func max_iter() -> (_max_iter: felt) {
 }
 
 @storage_var
-func centroids(centroid_index: felt) -> (_centroid: Matrix) {
+func centroids(centroid_index: felt) -> (_centroid: Point) {
 }
 
 
@@ -27,7 +28,7 @@ namespace KMeans {
         max_iter.write(_max_iter);
     }
     
-    func fit(x_train_len: felt, x_train: Matrix*) {
+    func fit{range_check_ptr}(x_train_len: felt, x_train: Matrix*) {
         alloc_locals;
         let (local array_a: felt*) = map_struct(get_first_element_at, x_train_len, x_train, Matrix.SIZE);
         let (local array_b: felt*) = map_struct(get_second_element_at, x_train_len, x_train, Matrix.SIZE);
