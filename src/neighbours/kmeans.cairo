@@ -56,31 +56,30 @@ namespace KMeans {
             //Ending algorithm if convergence reached
             return ();
         }
-
-        
-
-            # Sort each data point, assigning to nearest centroid
-            sorted_points = [[] for _ in range(self.n_clusters)]
-            for x in X_train:
-                dists = euclidean(x, self.centroids)
-                centroid_idx = np.argmin(dists)
-                sorted_points[centroid_idx].append(x)
+        let start_index = 0;
+        loop_data(start_index, x_train_len, x_train);
     }
 
     func loop_data(current_index: felt, x_train_len: felt, x_train: Matrix*) {
+
         if (current_index == x_train_len) {
             return ();
         }
-
+        alloc_locals;
         let current_point = x_train[current_index].array;
         let current_point_len = x_train[current_index].array_len;
-        distance_to_centroid(current_point_len, current_point);
-    
-
+        let cluster_index = 0;
+        let (local distances: felt*) = alloc();
+        distance_to_centroid(current_point_len, current_point, cluster_index, 0, distances);
         
+        
+
+        //centroid_idx = np.argmin(dists)
+        //sorted_points[centroid_idx].append(x)
+
     }
 
-    func distance_to_centroid(point_len: felt, point: felt, centroid_index: felt) {
+    func distance_to_centroid(point_len: felt, point: felt, centroid_index: felt, distances_len: felt, distances: felt) {
         let _n_cluster = n_clusters.read();
         if (centroid_index == _n_cluster) {
             return ();
@@ -91,7 +90,8 @@ namespace KMeans {
         assert centroid[0] = current_centroid.x;
         assert centroid[1] = current_centroid.y;
         let (_distance: felt) = euclidian(point_len, point, 2, centroid);
-
+        assert distances[distances_len] = _distance;
+        distance_to_centroid(point_len, point, centroid_index + 1, distances_len + 1, distances);
     }
 
     func evaluate(x_train: felt*) {

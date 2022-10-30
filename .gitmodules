@@ -1,3 +1,0 @@
-[submodule "cairo_streams"]
-	path = lib/cairo_streams
-	url = https://github.com/onlydustxyz/cairo-streams
