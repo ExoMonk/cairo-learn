@@ -4,8 +4,6 @@ from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.alloc import alloc
 
 from src.utils.distance import euclidian
-from src.utils.maths import map_struct
-from src.utils.arrays import get_first_element_at, get_second_element_at, min, max
 from src.utils.models import Matrix, Point
 
 @storage_var
@@ -29,31 +27,70 @@ namespace KMeans {
     }
     
     func fit{range_check_ptr}(x_train_len: felt, x_train: Matrix*) {
-        alloc_locals;
-        let (local array_a: felt*) = map_struct(get_first_element_at, x_train_len, x_train, Matrix.SIZE);
-        let (local array_b: felt*) = map_struct(get_second_element_at, x_train_len, x_train, Matrix.SIZE);
-        let _min_a = min(x_train_len, array_a);
-        let _min_b = min(x_train_len, array_b);
-        let _max_a = max(x_train_len, array_a);
-        let _max_b = max(x_train_len, array_b);
-        let (local _min: felt*) = alloc();
-        let (local _max: felt*) = alloc();
-        assert _min[0] = _min_a;
-        assert _min[1] = _min_b;
-        assert _max[0] = _max_a;
-        assert _max[1] = _max_b;
-
-
-
-        //self.centroids = [uniform(min_, max_) for _ in range(self.n_clusters)]
-
-
+        let _n_clusters = n_clusters.read();
+        setup_centroids(0, _n_clusters, x_train);
         let iteration = 0;
+        let prev_centroids = 0;
+        step(iteration, prev_centroids, x_train_len, x_train);
     }
 
-    func setup_centroids() {
+    func setup_centroids(centroid_index: felt, _n_clusters: felt, x_train: Matrix*) {
+        if (centroid_index + 1 == _n_clusters) {
+            return ();
+        }
+        let point = x_train[centroid_index];
+        let centroid = new Point(x=point.array[0], y=point.array[1]);
+        centroids.write(centroid_index, centroid);
+        setup_centroids(centroid_index + 1, _n_clusters, x_train);
+        return ();
+    }
 
-        centroids.write(1, 1);
+    func step(iteration: felt, prev_centroids: Point*, x_train_len: felt, x_train: Matrix*) -> {
+        // Step of a centroid
+        let _max_iter = max_iter.read();
+        if (iteration == _max_iter) {
+            //Ending Algorithm
+            return ();
+        }
+        if () {
+            //Ending algorithm if convergence reached
+            return ();
+        }
+
+        
+
+            # Sort each data point, assigning to nearest centroid
+            sorted_points = [[] for _ in range(self.n_clusters)]
+            for x in X_train:
+                dists = euclidean(x, self.centroids)
+                centroid_idx = np.argmin(dists)
+                sorted_points[centroid_idx].append(x)
+    }
+
+    func loop_data(current_index: felt, x_train_len: felt, x_train: Matrix*) {
+        if (current_index == x_train_len) {
+            return ();
+        }
+
+        let current_point = x_train[current_index].array;
+        let current_point_len = x_train[current_index].array_len;
+        distance_to_centroid(current_point_len, current_point);
+    
+
+        
+    }
+
+    func distance_to_centroid(point_len: felt, point: felt, centroid_index: felt) {
+        let _n_cluster = n_clusters.read();
+        if (centroid_index == _n_cluster) {
+            return ();
+        }
+        alloc_locals;
+        let current_centroid = centroids.read(centroid_index);
+        let (local centroid: felt*) = alloc();
+        assert centroid[0] = current_centroid.x;
+        assert centroid[1] = current_centroid.y;
+        let (_distance: felt) = euclidian(point_len, point, 2, centroid);
 
     }
 
