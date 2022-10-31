@@ -52,7 +52,10 @@ namespace KMeans {
             //Ending Algorithm reached maximum iterations.
             return ();
         }
-        let _centroids = get_centroids();
+        alloc_locals;
+        let _n_cluster = n_clusters.read();
+        let (local centroids: Point*) = alloc();
+        get_centroids(0, _n_cluster, centroids);
         if (prev_centroids == _centroids) {
             //Ending algorithm convergence reached.
             return ();
@@ -62,7 +65,6 @@ namespace KMeans {
     }
 
     func loop_data(current_index: felt, x_train_len: felt, x_train: Matrix*){
-
         if (current_index == x_train_len) {
             return ();
         }
@@ -98,12 +100,18 @@ namespace KMeans {
 
     }
 
-    func get_centroids() -> (centroids: Point*){
-        alloc_locals;
-        let (local centroids: Point*) = alloc();
+    func get_centroids(current_index: felt, _n_cluster: felt, centroids: Point*) -> (){
+        if (current_index == _n_cluster) {
+            return();
+        }
+        let current_point = centroids.read(current_index);
+        assert centroids[current_index] = current_point;
+        get_centroids(current_index + 1, _n_cluster, centroids);
+    }
+
+    func is_converging() -> (_is_converging: felt){
 
 
-        return ();
     }
 }
 
